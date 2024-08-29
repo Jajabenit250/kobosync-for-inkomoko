@@ -1,0 +1,10 @@
+
+
+# Base model for ClickHouse
+from pydantic import BaseModel
+
+
+class CommonModel(BaseModel):
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
