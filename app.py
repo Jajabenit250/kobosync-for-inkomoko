@@ -1,11 +1,11 @@
-from src.common.utils.config import initialize_clickhouse
 from nest.core import App
 from fastapi.middleware.cors import CORSMiddleware
-# import aioredis
+from src.database.db import init_db
+from src.logic.survey.survey_module import SurveyModule
 
 app = App(
     description="KoboTool Data Sync For Inkomoko APIs",
-    modules=[],
+    modules=[SurveyModule],
 )
 
 # Allow CORS for all domains
@@ -19,4 +19,4 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup():
-    initialize_clickhouse()
+    init_db()

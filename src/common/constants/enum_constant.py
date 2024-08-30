@@ -3,27 +3,31 @@
 from enum import Enum
 
 
-class SurveyStatus(str, Enum):
-    submitted_via_web = 'submitted_via_web'
-    submitted_via_mobile = 'submitted_via_mobile'
+class SurveyStatus(Enum):
+    submitted_via_web = 1
+    submitted_via_mobile = 2
 
-class PhoneType(str, Enum):
-    smart_phone = 'Smart phone'
-    feature_phone = 'Feature phone'
+class PhoneType(Enum):
+    smart_phone = 1
+    feature_phone = 2
 
-class Gender(str, Enum):
-    male = 'Male'
-    female = 'Female'
-    other = 'Other'
+class Gender(Enum):
+    male = 1
+    female = 2
+    other = 3
 
-class HasDisability(str, Enum):
-    yes = 'Yes'
-    no = 'No'
+class HasDisability(Enum):
+    yes = 1
+    no = 2
 
-class ClientStatus(str, Enum):
-    new = 'New'
-    existing = 'Existing'
+class ClientStatus(Enum):
+    new_clients = 1
+    existing_clients = 2
 
-class IsOperating(str, Enum):
-    yes = 'Yes'
-    no = 'No'
+class IsOperating(Enum):
+    yes = 1
+    no = 2
+    
+class BusinessStatus(Enum):
+    new_clients = 1
+    existing_clients = 2
