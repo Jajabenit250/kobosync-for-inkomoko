@@ -1,6 +1,5 @@
 import json
 
-
 async def register_webhook(session, url):
         async with session.post(
             "http://dev.inkomoko.com:1055/register_webhook",
@@ -10,4 +9,4 @@ async def register_webhook(session, url):
             },
         ) as response:
             return response
-        
+      
