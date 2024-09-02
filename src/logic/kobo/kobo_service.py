@@ -314,8 +314,8 @@ class KoboService:
                 if key.startswith(("sec_a/", "sec_b/", "sec_c/", "group_mx5fl16/")):
                     responses.append(
                         {
-                            "_id": int(survey.get("_id"), 0),
-                            "unique_id": survey.get("sec_a/unique_id"),
+                            "_id": int(self.safe_get(survey, "_id", 0)),
+                            "unique_id": int(self.safe_get(survey, "sec_a/unique_id", 0)),
                             "question_key": key,
                             "response": str(value),
                             "response_type": self.map_enum_value(
