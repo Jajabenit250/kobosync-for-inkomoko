@@ -14,6 +14,7 @@
   - [🛠️ Setup Instructions](#️-setup-instructions)
     - [Prerequisites:](#prerequisites)
     - [Configuration:](#configuration)
+  - [Setup Instructions](#setup-instructions)
     - [Deployment:](#deployment)
     - [Testing:](#testing)
   - [📚 Usage Guide](#-usage-guide)
@@ -275,17 +276,45 @@ Before you dive in, make sure you have the following installed:
 
 ### Configuration:
 
-1. Update your `.env` file with all the necessary environment variables.
-   use these configurations
+## Setup Instructions
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/Jajabenit250/kobosync-for-inkomoko.git
+   cd kobosync-for-inkomoko
    ```
 
-  CLICKHOUSE_DATABASE=default
-  CLICKHOUSE_HOST=52.54.67.242
-  CLICKHOUSE_USER=kobouser
-  CLICKHOUSE_PASSWORD=strongpassword
-  CLICKHOUSE_PORT=8123
-  PORT=3030
-  ```
+2. Install ClickHouse:
+   Follow the official ClickHouse installation guide for your operating system.
+
+3. Create a virtual environment and activate it:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
+
+4. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+
+5. Set up environment variables:
+   Create a `.env` file in the root directory and add the following:
+   ```
+   KOBO_API_TOKEN=your_kobo_api_token
+   CLICKHOUSE_HOST=localhost
+   CLICKHOUSE_PORT=9000
+   CLICKHOUSE_USER=default
+   CLICKHOUSE_PASSWORD=
+   CLICKHOUSE_DATABASE=kobo_extraction
+   ```
+6. Initialize the ClickHouse database:
+   Run the SQL scripts in `database_init.sql` to create the necessary tables.
+
+7. Start the application:
+   ```
+   uvicorn src.main:app --reload
+   ```
 
 ### Deployment:
 1. Fire up the containers with `docker-compose up -d`.
