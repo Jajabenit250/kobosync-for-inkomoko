@@ -54,13 +54,17 @@ class KoboService:
                 logging.warning("No Kobo data fetched.")
                 return
 
-            await self.save_locations(self.extract_locations(kobo_data), db)
-            await self.save_surveyors(self.extract_surveyors(kobo_data), db)
-            await self.save_clients(self.extract_clients(kobo_data), db)
-            await self.save_surveys(self.extract_surveys(kobo_data), db)
-            await self.save_survey_responses(
-                self.extract_survey_responses(kobo_data), db
-            )
+            tasks = [
+                self.save_locations(self.extract_locations(kobo_data), db),
+                self.save_surveyors(self.extract_surveyors(kobo_data), db),
+                self.save_clients(self.extract_clients(kobo_data), db),
+                self.save_surveys(self.extract_surveys(kobo_data), db),
+                self.save_survey_responses(
+                    self.extract_survey_responses(kobo_data), db
+                ),
+            ]
+
+            await asyncio.gather(*tasks)
 
             logging.info(f"Data extraction and saving completed at {datetime.now()}")
         except Exception as e:
@@ -68,36 +72,64 @@ class KoboService:
             raise
 
     def extract_surveys(self, kobo_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        current_time = self.format_datetime_for_clickhouse(datetime.now(timezone.utc).isoformat())
-        return [{
-            "_id": int(self.safe_get(survey, "_id", 0)),
-            "formhub_uuid": self.safe_get(survey, "formhub/uuid"),
-            "start_time": self.format_datetime_for_clickhouse(self.safe_get(survey, "starttime")),
-            "end_time": self.format_datetime_for_clickhouse(self.safe_get(survey, "endtime")),
-            "survey_date": self.format_date(self.safe_get(survey, "cd_survey_date")),
-            "instance_id": self.safe_get(survey, "meta/instanceID"),
-            "xform_id_string": self.safe_get(survey, "_xform_id_string"),
-            "uuid": self.safe_get(survey, "_uuid"),
-            "submission_time": self.format_datetime_for_clickhouse(self.safe_get(survey, "_submission_time")),
-            "version": self.safe_get(survey, "__version__"),
-            "location_id": f"{self.safe_get(survey, 'sec_a/cd_biz_country_name')}|{self.safe_get(survey, 'sec_a/cd_biz_region_name')}|{self.safe_get(survey, 'sec_c/cd_location')}",
-            "surveyor_id": self.safe_get(survey, "sec_b/bda_name"),
-            "client_id_manifest": self.safe_get(survey, "sec_c/cd_client_id_manifest"),
-            "business_status": self.map_enum_value(BusinessStatus, self.safe_get(survey, "group_mx5fl16/cd_biz_status")),
-            "business_operating": self.map_enum_value(YesNoUnknown, self.safe_get(survey, "group_mx5fl16/bd_biz_operating", 'unknown')),
-            "_geolocation": self.format_geolocation(self.safe_get(survey, "_geolocation", [])),
-            "_tags": self.format_array_for_clickhouse(self.safe_get(survey, "_tags", [])),
-            "_notes": self.format_array_for_clickhouse(self.safe_get(survey, "_notes", [])),
-            "_validation_status": self.format_dict_to_string(self.safe_get(survey, "_validation_status", {})),
-            "_submitted_by": self.safe_get(survey, "_submitted_by"),
-            "last_updated": current_time
-        } for survey in kobo_data]
+        current_time = self.format_datetime_for_clickhouse(
+            datetime.now(timezone.utc).isoformat()
+        )
+        return [
+            {
+                "_id": int(self.safe_get(survey, "_id", 0)),
+                "formhub_uuid": self.safe_get(survey, "formhub/uuid"),
+                "start_time": self.format_datetime_for_clickhouse(
+                    self.safe_get(survey, "starttime")
+                ),
+                "end_time": self.format_datetime_for_clickhouse(
+                    self.safe_get(survey, "endtime")
+                ),
+                "survey_date": self.format_date(
+                    self.safe_get(survey, "cd_survey_date")
+                ),
+                "instance_id": self.safe_get(survey, "meta/instanceID"),
+                "xform_id_string": self.safe_get(survey, "_xform_id_string"),
+                "uuid": self.safe_get(survey, "_uuid"),
+                "submission_time": self.format_datetime_for_clickhouse(
+                    self.safe_get(survey, "_submission_time")
+                ),
+                "version": self.safe_get(survey, "__version__"),
+                "location_id": f"{self.safe_get(survey, 'sec_a/cd_biz_country_name')}|{self.safe_get(survey, 'sec_a/cd_biz_region_name')}|{self.safe_get(survey, 'sec_c/cd_location')}",
+                "surveyor_id": self.safe_get(survey, "sec_b/bda_name"),
+                "client_id_manifest": self.safe_get(
+                    survey, "sec_c/cd_client_id_manifest"
+                ),
+                "business_status": self.map_enum_value(
+                    BusinessStatus, self.safe_get(survey, "group_mx5fl16/cd_biz_status")
+                ),
+                "business_operating": self.map_enum_value(
+                    YesNoUnknown,
+                    self.safe_get(survey, "group_mx5fl16/bd_biz_operating", "unknown"),
+                ),
+                "_geolocation": self.format_geolocation(
+                    self.safe_get(survey, "_geolocation", [])
+                ),
+                "_tags": self.format_array_for_clickhouse(
+                    self.safe_get(survey, "_tags", [])
+                ),
+                "_notes": self.format_array_for_clickhouse(
+                    self.safe_get(survey, "_notes", [])
+                ),
+                "_validation_status": self.format_dict_to_string(
+                    self.safe_get(survey, "_validation_status", {})
+                ),
+                "_submitted_by": self.safe_get(survey, "_submitted_by"),
+                "last_updated": current_time,
+            }
+            for survey in kobo_data
+        ]
 
     def format_datetime_for_clickhouse(self, value):
         if value:
             try:
-                dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
-                return dt.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+                dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
             except ValueError:
                 return None
         return None
@@ -105,7 +137,7 @@ class KoboService:
     def format_date(self, value):
         if value:
             try:
-                return datetime.strptime(value, '%Y-%m-%d').date().isoformat()
+                return datetime.strptime(value, "%Y-%m-%d").date().isoformat()
             except ValueError:
                 return None
         return None
@@ -118,22 +150,24 @@ class KoboService:
     def format_array_for_clickhouse(self, value):
         if isinstance(value, list):
             return json.dumps(value)
-        return '[]'
+        return "[]"
 
     def format_dict_to_string(self, value):
         if isinstance(value, dict):
             return json.dumps(value)
-        return '{}'
+        return "{}"
 
     async def save_surveys(self, surveys: List[Dict[str, Any]], db: Session):
         try:
             for survey in surveys:
-                existing_survey = (
-                    db.query(Survey).filter_by(_id=survey["_id"]).first()
-                )
+                existing_survey = db.query(Survey).filter_by(_id=survey["_id"]).first()
                 if existing_survey:
                     for key, value in survey.items():
-                        if key != "_id" and key != "submission_time" and key != "client_id_manifest":  # Don't update the primary keys
+                        if (
+                            key != "_id"
+                            and key != "submission_time"
+                            and key != "client_id_manifest"
+                        ):  # Don't update the primary keys
                             setattr(existing_survey, key, value)
                 else:
                     new_survey = Survey(**survey)
@@ -284,7 +318,9 @@ class KoboService:
                             "unique_id": survey.get("sec_a/unique_id"),
                             "question_key": key,
                             "response": str(value),
-                            "response_type": self.map_enum_value(ResponseType, self.get_response_type(value)),
+                            "response_type": self.map_enum_value(
+                                ResponseType, self.get_response_type(value)
+                            ),
                         }
                     )
         return responses
@@ -311,7 +347,6 @@ class KoboService:
                 existing_response = (
                     db.query(SurveyResponse)
                     .filter_by(
-                        _id=response["_id"],
                         unique_id=response["unique_id"],
                         question_key=response["question_key"],
                     )
@@ -330,12 +365,55 @@ class KoboService:
             raise
 
     @db_request_handler
-    async def daily_extraction(self, db: Session):
+    async def auto_update_current_data(self, db: Session):
         try:
-            await self.extract_and_save_data(db)
-            logging.info("Daily extraction completed successfully")
+            # Fetch the survey with the earliest submission_date to determine the last update date
+            last_submitted_survey = (
+                db.query(Survey.submission_time)
+                .order_by(Survey.submission_time.desc())
+                .first()
+            )
+
+            # Fetch all Kobo data
+            kobo_data = await self.data_service.fetch_kobo_data()
+
+            if not kobo_data:
+                logging.warning("No Kobo data fetched.")
+                return
+
+            # Filter data with submission_date greater than last_update_date
+            if last_submitted_survey.submission_time:
+                filtered_data = [
+                    survey
+                    for survey in kobo_data
+                    if datetime.fromisoformat(
+                        self.format_datetime_for_clickhouse(
+                            self.safe_get(survey, "_submission_time")
+                        )
+                    )
+                    > last_submitted_survey.submission_time
+                ]
+            else:
+                filtered_data = kobo_data
+
+            if not filtered_data:
+                logging.info("No new data to save after filtering.")
+                return
+
+            tasks = [
+                self.save_locations(self.extract_locations(filtered_data), db),
+                self.save_surveyors(self.extract_surveyors(filtered_data), db),
+                self.save_clients(self.extract_clients(filtered_data), db),
+                self.save_surveys(self.extract_surveys(filtered_data), db),
+                self.save_survey_responses(self.extract_survey_responses(filtered_data), db)
+            ]
+
+            await asyncio.gather(*tasks)
+            logging.info(f"Data extraction and saving completed at {datetime.now()}")
+
         except Exception as e:
             logging.error(f"Error in daily extraction: {str(e)}")
+            raise
 
     def setup_cron_job(self):
         scheduler = AsyncIOScheduler()
@@ -344,19 +422,3 @@ class KoboService:
         )  # Run at midnight every day
         scheduler.start()
         logging.info("Cron job for daily extraction has been set up")
-
-    @db_request_handler
-    async def process_webhook_data(self, data: Dict[str, Any], db: Session):
-        try:
-            await self.save_locations(self.extract_locations(data), db)
-            await self.save_surveyors(self.extract_surveyors(data), db)
-            await self.save_clients(self.extract_clients(data), db)
-            await self.save_surveys(self.extract_surveys(data), db)
-            await self.save_survey_responses(
-                self.extract_survey_responses(data), db
-            )
-
-            logging.info(f"Webhook data processed at {datetime.now()}")
-        except Exception as e:
-            logging.error(f"Error processing webhook data: {str(e)}")
-            raise

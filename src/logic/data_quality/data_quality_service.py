@@ -132,7 +132,7 @@ class DataQualityService:
                         {"type": "invalid_business_status", "survey_id": survey_id, "value": survey.get("group_mx5fl16/cd_biz_status")}
                     )
 
-                if survey.get("group_mx5fl16/bd_biz_operating") not in ["yes", "no"]:
+                if survey.get("group_mx5fl16/bd_biz_operating") not in ["yes", "no"] and survey.get("group_mx5fl16/cd_biz_status") in ["Existing Business"]:
                     issues.append(
                         {"type": "invalid_business_operating", "survey_id": survey_id, "value": survey.get("group_mx5fl16/bd_biz_operating")}
                     )

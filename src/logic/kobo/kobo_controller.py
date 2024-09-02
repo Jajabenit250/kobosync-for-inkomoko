@@ -17,22 +17,10 @@ class KoboController:
             logging.error(f"Error in extract_data endpoint: {str(e)}")
             raise HTTPException(status_code=500, detail="Internal server error during data extraction")
 
-    @Post("/webhook")
-    async def webhook(self, request: Request):
-        try:
-            print(request)
-            data = await request.json()
-            
-            await self.service.process_webhook_data(data)
-            return {"message": "Webhook data processed successfully"}
-        except Exception as e:
-            logging.error(f"Error in webhook endpoint: {str(e)}")
-            raise HTTPException(status_code=400, detail="Error processing webhook data")
-
-    @Get("/trigger-daily-extraction")
+    @Get("/webhook")
     async def trigger_daily_extraction(self):
         try:
-            await self.service.daily_extraction()
+            await self.service.auto_update_current_data()
             return {"message": "Daily extraction triggered successfully"}
         except Exception as e:
             logging.error(f"Error triggering daily extraction: {str(e)}")
