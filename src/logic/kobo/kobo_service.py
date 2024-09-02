@@ -77,7 +77,7 @@ class KoboService:
         )
         return [
             {
-                "_id": int(self.safe_get(survey, "_id", 0)),
+                "_id": self.safe_get(survey, "_id"),
                 "formhub_uuid": self.safe_get(survey, "formhub/uuid"),
                 "start_time": self.format_datetime_for_clickhouse(
                     self.safe_get(survey, "starttime")
@@ -314,7 +314,7 @@ class KoboService:
                 if key.startswith(("sec_a/", "sec_b/", "sec_c/", "group_mx5fl16/")):
                     responses.append(
                         {
-                            "_id": int(self.safe_get(survey, "_id", 0)),
+                            "_id": self.safe_get(survey, "_id"),
                             "unique_id": self.safe_get(survey, "sec_a/unique_id"),
                             "question_key": key,
                             "response": str(value),
