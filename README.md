@@ -383,8 +383,4 @@ Performance is key, especially when dealing with large datasets. We’ve impleme
 - **Indexing**: Strategic indexing in ClickHouse to speed up queries.
 - **Batch Processing**: Data is processed in batches where possible, reducing the load on the system.
 - **Asynchronous Operations**: Utilizing FastAPI’s async capabilities to handle multiple requests concurrently without slowing down.
-- **Caching**: Frequently accessed data is cached to reduce the need for repetitive database queries.
 - **Connection Pooling**: Efficiently managing database connections to prevent bottlenecks.
-
----
-
