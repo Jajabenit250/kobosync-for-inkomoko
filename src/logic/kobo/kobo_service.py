@@ -315,7 +315,7 @@ class KoboService:
                     responses.append(
                         {
                             "_id": int(self.safe_get(survey, "_id", 0)),
-                            "unique_id": int(self.safe_get(survey, "sec_a/unique_id", 0)),
+                            "unique_id": self.safe_get(survey, "sec_a/unique_id", 0),
                             "question_key": key,
                             "response": str(value),
                             "response_type": self.map_enum_value(
