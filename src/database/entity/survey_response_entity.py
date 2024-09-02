@@ -9,11 +9,11 @@ class SurveyResponse(Base):
     __tablename__ = 'survey_responses'
     __table_args__ = (
         engines.ReplacingMergeTree(
-            order_by=('unique_id', 'question_key')
+            order_by=('unique_id', 'question_key', '_id')
         ),
     )
     
-    _id = Column(types.Int, ForeignKey('surveys._id')) 
+    _id = Column(types.String, ForeignKey('surveys._id')) 
     unique_id = Column(types.String, primary_key=True)    # Original key: "sec_a/unique_id"
     question_key = Column(types.String, primary_key=True) # Original question key from KoboToolbox
     response = Column(types.String)                       # Response value
