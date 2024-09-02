@@ -348,6 +348,7 @@ class KoboService:
                 existing_response = (
                     db.query(SurveyResponse)
                     .filter_by(
+                        _id = response["_id"],
                         unique_id=response["unique_id"],
                         question_key=response["question_key"],
                     )
@@ -355,7 +356,10 @@ class KoboService:
                 )
                 if existing_response:
                     for key, value in response.items():
-                        setattr(existing_response, key, value)
+                        if (
+                            key != "_id" and key != "unique_id" and key != 'question_key' and key != 'last_updated' 
+                        ):  # Don't update the primary keys
+                            setattr(existing_response, key, value)
                 else:
                     new_response = SurveyResponse(**response)
                     db.add(new_response)
