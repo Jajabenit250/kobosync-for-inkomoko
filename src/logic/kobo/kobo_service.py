@@ -57,7 +57,6 @@ class KoboService:
             await self.save_locations(self.extract_locations(kobo_data), db)
             await self.save_surveyors(self.extract_surveyors(kobo_data), db)
             await self.save_clients(self.extract_clients(kobo_data), db)
-            print("done syncying client -----")
             await self.save_surveys(self.extract_surveys(kobo_data), db)
             await self.save_survey_responses(
                 self.extract_survey_responses(kobo_data), db
@@ -349,22 +348,13 @@ class KoboService:
     @db_request_handler
     async def process_webhook_data(self, data: Dict[str, Any], db: Session):
         try:
-            if "survey" in data:
-                await self.save_surveys([self.extract_surveys([data["survey"]])[0]], db)
-            if "location" in data:
-                await self.save_locations(
-                    [self.extract_locations([data["location"]])[0]], db
-                )
-            if "client" in data:
-                await self.save_clients([self.extract_clients([data["client"]])[0]], db)
-            if "surveyor" in data:
-                await self.save_surveyors(
-                    [self.extract_surveyors([data["surveyor"]])[0]], db
-                )
-            if "survey_response" in data:
-                await self.save_survey_responses(
-                    [self.extract_survey_responses([data["survey_response"]])[0]], db
-                )
+            await self.save_locations(self.extract_locations(data), db)
+            await self.save_surveyors(self.extract_surveyors(data), db)
+            await self.save_clients(self.extract_clients(data), db)
+            await self.save_surveys(self.extract_surveys(data), db)
+            await self.save_survey_responses(
+                self.extract_survey_responses(data), db
+            )
 
             logging.info(f"Webhook data processed at {datetime.now()}")
         except Exception as e:

@@ -35,8 +35,8 @@ class BusinessStatus(Enum):
     existing_business = 2
 
 class ResponseType(Enum):
-    TEXT = 1
-    NUMBER = 2
-    CHOICE = 3
-    MULTIPLE_CHOICE = 4
-    DATE = 5
+    text = 1
+    number = 2
+    choice = 3
+    multiple_choice = 4
+    date = 5

@@ -2,6 +2,7 @@ from nest.core import Controller, Get, Post, Depends
 from .kobo_service import KoboService
 from fastapi import HTTPException, Request
 import logging
+from src.database.models.kobo_data_model import KoboDataModel
 
 @Controller("kobo")
 class KoboController:
@@ -19,7 +20,10 @@ class KoboController:
     @Post("/webhook")
     async def webhook(self, request: Request):
         try:
+            print(request)
+            
             data = await request.json()
+            
             await self.service.process_webhook_data(data)
             return {"message": "Webhook data processed successfully"}
         except Exception as e:
