@@ -42,5 +42,4 @@ class Survey(Base):
     surveyor = relationship("Surveyor", back_populates="surveys")
     client = relationship("Client", back_populates="surveys")
     
-    survey_responses = relationship("SurveyResponse", back_populates="survey")
     
