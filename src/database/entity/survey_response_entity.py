@@ -9,8 +9,7 @@ class SurveyResponse(Base):
     __tablename__ = 'survey_responses'
     __table_args__ = (
         engines.ReplacingMergeTree(
-            order_by=('unique_id', 'question_key'),
-            version='last_updated'
+            order_by=('unique_id', 'question_key')
         ),
     )
     

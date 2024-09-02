@@ -1,91 +1,90 @@
-# KoboSync Data Extraction System: Comprehensive Documentation
+# 📊 KoboSync Data Extraction System
 
 ## Table of Contents
-- [KoboSync Data Extraction System: Comprehensive Documentation](#kobosync-data-extraction-system-comprehensive-documentation)
+
+- [📊 KoboSync Data Extraction System](#-kobosync-data-extraction-system)
   - [Table of Contents](#table-of-contents)
-  - [1. Project Overview](#1-project-overview)
-  - [2. Key Decisions and Rationale](#2-key-decisions-and-rationale)
-  - [3. System Architecture](#3-system-architecture)
-  - [4. Database Schema](#4-database-schema)
+  - [🚀 Project Overview](#-project-overview)
+    - [What You'll Love About It:](#what-youll-love-about-it)
+  - [💡 Key Decisions and Rationale](#-key-decisions-and-rationale)
+  - [🛠️ System Architecture](#️-system-architecture)
+  - [🗄️ Database Schema](#️-database-schema)
     - [Schema Diagram](#schema-diagram)
     - [SQL Schema](#sql-schema)
-  - [5. Setup Instructions](#5-setup-instructions)
-  - [6. Usage Guide](#6-usage-guide)
+  - [🛠️ Setup Instructions](#️-setup-instructions)
+    - [Prerequisites:](#prerequisites)
+    - [Configuration:](#configuration)
+    - [Deployment:](#deployment)
+    - [Testing:](#testing)
+  - [📚 Usage Guide](#-usage-guide)
     - [Extracting Data](#extracting-data)
     - [Viewing Data Quality Issues](#viewing-data-quality-issues)
     - [Webhook for Real-time Updates](#webhook-for-real-time-updates)
-  - [7. API Documentation](#7-api-documentation)
-    - [Kobo Extraction Endpoints](#kobo-extraction-endpoints)
-    - [Data Quality Endpoints](#data-quality-endpoints)
-  - [8. Data Quality Checks](#8-data-quality-checks)
-  - [9. Real-time Processing](#9-real-time-processing)
-  - [10. Cron Jobs](#10-cron-jobs)
-  - [11. Error Handling and Logging](#11-error-handling-and-logging)
-  - [12. Testing](#12-testing)
-  - [13. Performance Optimization](#13-performance-optimization)
-  - [14. Monitoring and Maintenance](#14-monitoring-and-maintenance)
-  - [15. Security Considerations](#15-security-considerations)
-  - [16. Troubleshooting](#16-troubleshooting)
+    - [Surveys List](#surveys-list)
+  - [📖 API Documentation](#-api-documentation)
+  - [✅ Data Quality Checks](#-data-quality-checks)
+  - [⚡ Real-time Processing](#-real-time-processing)
+    - [Webhook Workflow:](#webhook-workflow)
+  - [🧪 Testing](#-testing)
+    - [Test Types:](#test-types)
+  - [🚀 Performance Optimization](#-performance-optimization)
+    - [Key Optimizations:](#key-optimizations)
 
-## 1. Project Overview
+---
 
-The KoboToolbox Data Extraction System is designed to efficiently extract, process, and store large volumes of survey data from KoboToolbox. It provides real-time updates, ensures data quality, and offers a scalable architecture for handling growing datasets.
+## 🚀 Project Overview
 
-Key Features:
-- Efficient data extraction from KoboToolbox API
-- ClickHouse integration for high-performance data storage and querying
-- Real-time updates via webhooks
-- Comprehensive data quality checks
-- Scheduled daily extractions
-- Scalable architecture for handling large datasets
+Welcome to the **KoboSync Data Extraction System**! This project is all about making it easier to extract, process, and store survey data from KoboToolbox. We built it with performance and scalability in mind, so whether you’re dealing with a handful of surveys or thousands, this system has you covered.
 
-## 2. Key Decisions and Rationale
+### What You'll Love About It:
+
+- **Lightning-fast** data extraction thanks to ClickHouse
+- Real-time updates via **webhooks**
+- **Rock-solid** data quality checks to keep everything in check
+- **Daily scheduled extractions** so you don’t have to worry about missing any data
+- **Built to scale** as your data grows
+
+---
+
+## 💡 Key Decisions and Rationale
+
+Here’s a quick rundown of some key choices I made while building this system and why:
 
 1. **Database Choice: ClickHouse**
-   - Decision: Used ClickHouse instead of a traditional relational database.
-   - Rationale: Optimized for analytical queries on large datasets, offering faster aggregations and better compression.
+   - **Why?** We picked ClickHouse because it’s awesome at handling large datasets and running analytical queries quickly. Perfect for the kind of heavy lifting that's needed.
 
 2. **Data Model: Normalized Structure**
-   - Decision: Created separate tables for surveys, locations, clients, surveyors, and survey responses instead of using the original sec_a, sec_b, sec_c structure.
-   - Rationale: 
-     a. Better query performance
-     b. Reduced data redundancy
-     c. Easier maintenance
-     d. Flexibility for future changes
+   - **Why?** A normalized structure keeps the data clean, makes queries faster, and reduces redundancy. It also makes future updates and maintenance much easier.
 
 3. **Real-time Processing: Webhook Implementation**
-   - Decision: Implemented a webhook endpoint for real-time data updates.
-   - Rationale: Ensures immediate processing of new survey submissions.
+   - **Why?** We added a webhook so that every time a new survey submission comes in, it gets processed immediately. No waiting around!
 
 4. **Data Quality: Comprehensive Checks**
-   - Decision: Implemented extensive data quality checks at both insertion and query time.
-   - Rationale: Ensures data integrity and reliability.
+   - **Why?** Data quality is non-negotiable. We implemented checks at multiple stages to ensure the data is reliable and accurate.
 
 5. **Asynchronous Processing: FastAPI and asyncio**
-   - Decision: Used FastAPI and asyncio for asynchronous operations.
-   - Rationale: Improves concurrency and system responsiveness.
+   - **Why?** FastAPI with asyncio lets us handle multiple tasks at once without slowing down. This makes the system more responsive.
 
 6. **Scalability: Distributed Architecture**
-   - Decision: Designed the system to be horizontally scalable.
-   - Rationale: Allows for easy expansion to handle increasing data volumes.
+   - **Why?** We designed it to scale horizontally, so as your data grows, the system can easily grow with it.
 
 7. **Error Handling and Logging: Comprehensive Approach**
-   - Decision: Implemented detailed error handling and logging.
-   - Rationale: Facilitates easier debugging and monitoring.
+   - **Why?** Good logging and error handling make it easier to troubleshoot issues and keep everything running smoothly.
 
 8. **Testing: Comprehensive Test Suite**
-   - Decision: Created an extensive test suite.
-   - Rationale: Ensures system reliability and helps catch issues early.
+   - **Why?** We set up a full suite of tests to make sure everything works as expected and to catch any issues early.
 
 9. **Security: Multiple Layers**
-   - Decision: Implemented various security measures.
-   - Rationale: Protects sensitive survey data and prevents unauthorized access.
+   - **Why?** Security is key, so I implemented several layers of protection to keep your data safe.
 
 10. **Performance Optimization: ClickHouse-Specific Techniques**
-    - Decision: Utilized ClickHouse-specific optimizations.
-    - Rationale: Leverages ClickHouse's full power for faster queries and efficient storage.
+    - **Why?** We wanted to get the most out of ClickHouse, so I used some of its unique features to optimize performance even further.
 
-## 3. System Architecture
+---
+
+## 🛠️ System Architecture
+
+Let’s take a quick look at how everything fits together:
 
 ```mermaid
 graph TD
@@ -103,9 +102,15 @@ graph TD
     M --> J
 ```
 
-## 4. Database Schema
+Everything starts with KoboToolbox. I extracted the data using `KoboService`, store it in ClickHouse, and then handle it through our API or process it in real-time via the webhook.
+
+---
+
+## 🗄️ Database Schema
 
 ### Schema Diagram
+
+Here’s a visual representation of how our data is structured:
 
 ```mermaid
 erDiagram
@@ -178,6 +183,8 @@ erDiagram
 
 ### SQL Schema
 
+And here’s how that schema looks in SQL:
+
 ```sql
 CREATE TABLE surveys
 (
@@ -195,7 +202,7 @@ CREATE TABLE surveys
     location_id String,
     surveyor_id String,
     client_id_manifest String,
-    business_status Enum8('Existing Business' = 1, 'New Business' = 2, 'Not Operating' = 3),
+    business_status Enum8('Existing Business' = 1, 'New Business' = 2, 'Idea stage' = 3),
     business_operating Enum8('yes' = 1, 'no' = 0),
     last_updated DateTime,
     _geolocation Array(Nullable(Float64)),
@@ -221,7 +228,7 @@ CREATE TABLE clients
     name String,
     phone String,
     alternate_phone String,
-    phone_type Enum8('Smart phone' = 1, 'Feature phone' = 2, 'Basic phone' = 3),
+    phone_type Enum8('Smart phone' = 1, 'Feature phone' = 2, 'Smart phone Feature phone' = 3),
     gender Enum8('Male' = 1, 'Female' = 2),
     age UInt8,
     nationality LowCardinality(String),
@@ -246,161 +253,109 @@ ORDER BY surveyor_id;
 
 CREATE TABLE survey_responses
 (
-    _id UInt64,
+id UInt64,
     unique_id String,
     question_key String,
     response String,
-    response_type Enum8('text' = 1, 'number' = 2, 'choice' = 3, 'multiple_choice' = 4, 'date' = 5),
+    response_type Enum8('text' = 1, 'number' = 2, 'date' = 3, 'select' = 4),
     last_updated DateTime
 ) ENGINE = ReplacingMergeTree(last_updated)
 ORDER BY (_id, unique_id, question_key);
 ```
 
-## 5. Setup Instructions
+---
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/Jajabenit250/kobosync-for-inkomoko.git
-   cd kobosync-for-inkomoko
-   ```
+## 🛠️ Setup Instructions
 
-2. Install ClickHouse:
-   Follow the official ClickHouse installation guide for your operating system.
+### Prerequisites:
+Before you dive in, make sure you have the following installed:
 
-3. Create a virtual environment and activate it:
-   ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
+- **Docker** and **Docker Compose**
+- **ClickHouse** and **FastAPI** dependencies (grab them from the `requirements.txt`)
 
-4. Install dependencies:
-   ```
-   pip install -r requirements.txt
+### Configuration:
+
+1. Update your `.env` file with all the necessary environment variables.
+   use these configurations
    ```
 
-5. Set up environment variables:
-   Create a `.env` file in the root directory and add the following:
-   ```
-   KOBO_API_TOKEN=your_kobo_api_token
-   CLICKHOUSE_HOST=localhost
-   CLICKHOUSE_PORT=9000
-   CLICKHOUSE_USER=default
-   CLICKHOUSE_PASSWORD=
-   CLICKHOUSE_DATABASE=kobo_extraction
-   ```
+  CLICKHOUSE_DATABASE=default
+  CLICKHOUSE_HOST=52.54.67.242
+  CLICKHOUSE_USER=kobouser
+  CLICKHOUSE_PASSWORD=strongpassword
+  CLICKHOUSE_PORT=8123
+  PORT=3030
+  ```
 
-6. Initialize the ClickHouse database:
-   Run the SQL scripts in `database_init.sql` to create the necessary tables.
+### Deployment:
+1. Fire up the containers with `docker-compose up -d`.
 
-7. Start the application:
-   ```
-   uvicorn src.main:app --reload
-   ```
+### Testing:
+1. Run tests with `pytest` to make sure everything’s working as expected.
+2. Use the provided Postman collection to test out the API endpoints.
 
-## 6. Usage Guide
+---
+
+## 📚 Usage Guide
 
 ### Extracting Data
-- To manually trigger a data extraction, send a GET request to `/kobo-extraction/extract`
-- The system will automatically extract data daily using a cron job
+To pull data from KoboToolbox manually, hit up the `/kobo/extract` endpoint. All the data will be stored in the ClickHouse tables.
 
 ### Viewing Data Quality Issues
-- Send a GET request to `/data-quality/issues` to view current data quality issues
-- To run a new data quality check, send a POST request to `/data-quality/check`
+Need to check for any data quality issues? The `/data-quality/check` endpoint has got you covered.
 
 ### Webhook for Real-time Updates
-- Set up a webhook in KoboToolbox pointing to `/kobo-extraction/webhook`
-- The system will process incoming data in real-time
+If you want to get data as soon as it’s submitted, make sure to register your webhook URL with KoboToolbox.
 
-## 7. API Documentation
+### Surveys List
+Want to see a list of all the surveys in the system? Just call the `/surveys` endpoint.
 
-### Kobo Extraction Endpoints
-- `GET /kobo-extraction/extract`: Triggers a manual data extraction
-- `POST /kobo-extraction/webhook`: Endpoint for KoboToolbox webhook
+---
 
-### Data Quality Endpoints
-- `GET /data-quality/issues`: Retrieves current data quality issues
-- `POST /data-quality/check`: Runs a new data quality check
+## 📖 API Documentation
+- Documentation can be found here http://52.54.67.242:3030/docs#/
 
-## 8. Data Quality Checks
+## ✅ Data Quality Checks
 
-The system performs the following data quality checks:
-- Missing required fields
-- Invalid data formats (e.g., dates, UUIDs)
-- Logical inconsistencies (e.g., end time before start time)
-- Data range validations (e.g., age limits)
-- Duplicate entries
-- Geolocation validity
-- Enum value validations
+2. **Value Range Checks**: Ensures that numeric fields fall within acceptable ranges. For example, ages or response counts are checked to make sure they're realistic.
+3. **Date Consistency**: Verifies that date fields, such as `submission_time`, `start_time`, and `end_time`, make sense chronologically.
+4. **Geolocation Validation**: Confirms that geolocation data falls within valid latitude and longitude ranges.
+5. **Unique Constraint Checks**: Ensures that fields like `unique_id` remain unique across the dataset.
+6. **Cross-field Validation**: Looks at the relationships between fields to ensure they make sense together, like making sure `end_time` is after `start_time`.
 
-## 9. Real-time Processing
+---
 
-The webhook endpoint `/kobo-extraction/webhook` handles real-time updates:
-- Validates incoming data
-- Processes and stores new survey data
-- Updates existing records if necessary
-- Triggers data quality checks on new data
+## ⚡ Real-time Processing
 
-## 10. Cron Jobs
+Our system is designed to handle real-time data processing efficiently. As soon as a new survey submission is made, it's captured by the webhook and processed immediately, updating the database and running data quality checks on the fly. This ensures that your data is always up-to-date and ready for analysis.
 
-A daily cron job is set up to:
-- Extract new data from KoboToolbox
-- Perform data quality checks
-- Optimize ClickHouse tables
+### Webhook Workflow:
+1. **Kobo Submission**: A new submission is made in KoboToolbox.
+2. **Webhook Triggered**: The webhook captures the submission and sends it to our system.
+3. **Processing & Storage**: The data is validated, processed, and stored in ClickHouse.
+4. **Data Quality Checks**: All quality checks are run to ensure the data is accurate and consistent.
 
-To modify the cron schedule, edit the `crontab` file:
-```
-0 0 * * * /path/to/your/python /path/to/your/script.py
-```
+---
 
-## 11. Error Handling and Logging
+## 🧪 Testing
 
-- All exceptions are caught and logged
-- Logs are stored in `/var/log/kobo-extraction/`
-- Log levels: INFO for normal operations, ERROR for exceptions
-- Separate log files for application errors and data quality issues
+Testing is a core part of our development process. I did implemented a comprehensive suite of tests to ensure the system works as expected under different scenarios.
 
-## 12. Testing
+### Test Types:
+- **Unit Tests**: Check individual components to ensure they perform as expected.
 
-Run the test suite using pytest:
-```
-pytest
-```
+---
 
-The test suite includes:
-- Unit tests for all services
-- Integration tests for ClickHouse operations
-- API endpoint tests
-- Data quality check tests
-- Concurrency and performance tests
+## 🚀 Performance Optimization
 
-## 13. Performance Optimization
+Performance is key, especially when dealing with large datasets. We’ve implemented several optimizations to keep things running fast and smooth:
 
-- Use of ClickHouse's columnar storage for efficient data retrieval
-- Implemented data partitioning and indexing strategies
-- Asynchronous processing for API requests and data extraction
-- Batch inserts for improved write performance
+### Key Optimizations:
+- **Indexing**: Strategic indexing in ClickHouse to speed up queries.
+- **Batch Processing**: Data is processed in batches where possible, reducing the load on the system.
+- **Asynchronous Operations**: Utilizing FastAPI’s async capabilities to handle multiple requests concurrently without slowing down.
+- **Caching**: Frequently accessed data is cached to reduce the need for repetitive database queries.
+- **Connection Pooling**: Efficiently managing database connections to prevent bottlenecks.
 
-## 14. Monitoring and Maintenance
+---
 
-- Regular backups of ClickHouse data
-- Monitoring of system resources (CPU, memory, disk usage)
-- API endpoint health checks
-- Performance metric collection (request latency, data processing time)
-
-## 15. Security Considerations
-
-- Use of environment variables for sensitive configuration
-- Implementation of rate limiting on API endpoints
-- Regular security audits and dependency updates
-- Data encryption for sensitive information
-- Access control and authentication for API endpoints
-
-## 16. Troubleshooting
-
-Common issues and their solutions:
-- API Connection Errors: Check your internet connection and verify the API token
-- ClickHouse Errors: Ensure ClickHouse is running and the connection details are correct
-- Webhook Errors: Verify the webhook URL in KoboToolbox settings
-- Data Quality Issues: Review the data quality logs and adjust checks if necessary
-
-For further assistance, please open an issue on the GitHub repository.

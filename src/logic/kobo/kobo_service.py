@@ -321,6 +321,7 @@ class KoboService:
                             "response_type": self.map_enum_value(
                                 ResponseType, self.get_response_type(value)
                             ),
+                            "last_updated": datetime.now()
                         }
                     )
         return responses
