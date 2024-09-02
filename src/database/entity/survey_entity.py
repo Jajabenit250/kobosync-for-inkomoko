@@ -16,7 +16,7 @@ class Survey(Base):
         ),
     )
 
-    _id = Column(types.String, primary_key=True)                     # Original key: "_id"
+    _id = Column(types.Int, primary_key=True)                     # Original key: "_id"
     formhub_uuid = Column(types.String)                               # Original key: "formhub/uuid"
     start_time = Column(types.DateTime)                               # Original key: "starttime"
     end_time = Column(types.DateTime)                                 # Original key: "endtime"
