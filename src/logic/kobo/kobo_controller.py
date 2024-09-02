@@ -20,8 +20,6 @@ class KoboController:
     @Post("/webhook")
     async def webhook(self, request: Request):
         try:
-            print(request)
-            
             data = await request.json()
             
             await self.service.process_webhook_data(data)

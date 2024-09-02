@@ -1,4 +1,3 @@
-# test_kobo_extraction_service.py
 import pytest
 from unittest.mock import Mock, patch
 from src.logic.kobo.kobo_service import KoboService
